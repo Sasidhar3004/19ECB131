@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for the stack
+typedef struct {
+    int *array;     // Pointer to the array holding stack elements
+    int capacity;   // Maximum number of elements the stack can hold
+    int top;        // Index of the top element (-1 if empty)
+} Stack;
+
+// Function to initialize the stack
+Stack* createStack(int capacity) {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    if (!stack) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    stack->capacity = capacity;
+    stack->top = -1;
+    stack->array = (int*)malloc(stack->capacity * sizeof(int));
+    if (!stack->array) {
+        fprintf(stderr, "Memory allocation failed\n");
+        free(stack);
+        exit(EXIT_FAILURE);
+    }
+    return stack;
+}
+
+// Function to check if the stack is full
+int isFull(Stack* stack) {
+    return stack->top == stack->capacity - 1;
+}
+
+// Function to check if the stack is empty
+int isEmpty(Stack* stack) {
+    return stack->top == -1;
+}
+
+// Function to push an element onto the stack
+void Push(Stack* stack, int element) {
+    if (isFull(stack)) {
+        fprintf(stderr, "Stack overflow\n");
+        return;
+    }
+    stack->array[++stack->top] = element;
+}
+
+// Function to pop an element from the stack
+void Pop(Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack is empty\n");
+        return;
+    }
+    printf("%d\n", stack->array[stack->top--]);
+}
+
+// Function to display the status of the stack
+void status(Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack is empty\n");
+        return;
+    }
+    printf("[");
+    for (int i = 0; i <= stack->top; i++) {
+        printf("%d", stack->array[i]);
+        if (i < stack->top) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+int main() {
+    int capacity = 10; // You can adjust the initial capacity
+    Stack* stack = createStack(capacity);
+    int choice, element;
+
+    while (1) {
+        printf("1:PUSH  2:POP  3:DISPLAY  4:EXIT\n");
+        printf("Enter your choice:");
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            // Clear the input buffer
+            while (getchar() != '\n');
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                printf("Enter element to be added:");
+                if (scanf("%d", &element) != 1) {
+                    printf("Invalid input. Please enter a number.\n");
+                    while (getchar() != '\n');
+                    continue;
+                }
+                Push(stack, element);
+                break;
+            case 2:
+                Pop(stack);
+                break;
+            case 3:
+                status(stack);
+                break;
+            case 4:
+                // Free the dynamically allocated memory before exiting
+                free(stack->array);
+                free(stack);
+                return 0;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0; // Should not reach here
+}
