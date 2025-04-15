@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure for a tree node
+struct Node {
+    int data;
+    struct Node *left;
+    struct Node *right;
+};
+
+// Structure for a queue node (used for BFS)
+struct QueueNode {
+    struct Node *node;
+    struct QueueNode *next;
+};
+
+// Structure for the queue
+struct Queue {
+    struct QueueNode *front;
+    struct QueueNode *rear;
+};
+
+// Function to create a new node
+struct Node* newNode(int data) {
+    struct Node* node = (struct Node*) malloc(sizeof(struct Node));
+    node->data = data;
+    node->left = NULL;
+    node->right = NULL;
+    return node;
+}
+
+// Function to create an empty queue
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*) malloc(sizeof(struct Queue));
+    queue->front = NULL;
+    queue->rear = NULL;
+    return queue;
+}
+
+// Function to check if the queue is empty
+int isEmpty(struct Queue* queue) {
+    return (queue->front == NULL);
+}
+
+// Function to enqueue a node
+void enqueue(struct Queue* queue, struct Node* node) {
+    struct QueueNode* newNode = (struct QueueNode*) malloc(sizeof(struct QueueNode));
+    newNode->node = node;
+    newNode->next = NULL;
+    if (isEmpty(queue)) {
+        queue->front = newNode;
+        queue->rear = newNode;
+    } else {
+        queue->rear->next = newNode;
+        queue->rear = newNode;
+    }
+}
+
+// Function to dequeue a node
+struct Node* dequeue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        return NULL;
+    }
+    struct QueueNode* temp = queue->front;
+    struct Node* node = temp->node;
+    queue->front = queue->front->next;
+    if (queue->front == NULL) {
+        queue->rear = NULL;
+    }
+    free(temp);
+    return node;
+}
+
+// Breadth-First Traversal function
+void breadthFirstTraversal(struct Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    struct Queue* queue = createQueue();
+    enqueue(queue, root);
+
+    printf("Breadth-First Traversal: ");
+    while (!isEmpty(queue)) {
+        struct Node* currentNode = dequeue(queue);
+        printf("%d ", currentNode->data);
+
+        if (currentNode->left != NULL) {
+            enqueue(queue, currentNode->left);
+        }
+        if (currentNode->right != NULL) {
+            enqueue(queue, currentNode->right);
+        }
+    }
+    printf("\n");
+    free(queue);
+}
+
+// Example usage (you would typically build your tree elsewhere)
+int main() {
+    struct Node* root = newNode(1);
+    root->left = newNode(2);
+    root->right = newNode(3);
+    root->left->left = newNode(4);
+    root->left->right = newNode(5);
+
+    breadthFirstTraversal(root);
+
+    return 0;
+}
